@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
-from chat.models import Message , Sender, User
+from chat.models import Message, Sender, User
 
 
 def createSender(email):
@@ -95,30 +95,34 @@ def get(request, user, rec = None):
         }
         return JsonResponse(error, status=400)
 
+def senderData(user):
+    messages = Message.objects.filter( Q(sender__email=user) | Q(recipient__email=user) )
+    senders1 = messages.values("sender").distinct()
+    senders2 = messages.values("recipient").distinct()
+    data = []
+    for senderid in senders1:
+        sender = Sender.objects.get(pk=senderid["sender"])
+        if sender.email != user and sender not in data:
+            data.append({
+                "name" : sender.name,
+                "email" : sender.email,
+                "id" : sender.id,
+                "imageUrl" : sender.imageUrl,
+            })
+    for senderid in senders2:
+        sender = Sender.objects.get(pk=senderid["recipient"])
+        if sender.email != user and sender not in data:
+            data.append({
+                "name" : sender.name,
+                "email" : sender.email,
+                "id" : sender.id,
+                "imageUrl" : sender.imageUrl,
+            })
+    return data
+
 def senders(request, user):
     try:
-        messages = Message.objects.filter( Q(sender__email=user) | Q(recipient__email=user) )
-        senders1 = messages.values("sender").distinct()
-        senders2 = messages.values("recipient").distinct()
-        data = []
-        for senderid in senders1:
-            sender = Sender.objects.get(pk=senderid["sender"])
-            if sender.email != user and sender not in data:
-                data.append({
-                    "name" : sender.name,
-                    "email" : sender.email,
-                    "id" : sender.id,
-                    "imageUrl" : sender.imageUrl,
-                })
-        for senderid in senders2:
-            sender = Sender.objects.get(pk=senderid["recipient"])
-            if sender.email != user and sender not in data:
-                data.append({
-                    "name" : sender.name,
-                    "email" : sender.email,
-                    "id" : sender.id,
-                    "imageUrl" : sender.imageUrl,
-                })
+        data = senderData(user)
         return JsonResponse(data, safe=False)
     except Exception as e:
         e_type, e_obj, e_tb = sys.exc_info()
