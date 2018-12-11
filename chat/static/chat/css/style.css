@@ -1,0 +1,60 @@
+body {
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+.v-btn {
+    text-transform: none
+}
+.messageContent{
+    white-space: pre-wrap;
+}
+.messageIn{
+    border: 1px solid #ccc;
+    border-radius: 0px 7px 7px 7px;
+    margin-bottom: 5px;
+    margin-right: 20px;
+}
+.messageOut{
+    border: 1px solid #ccc;
+    border-radius: 7px 0px 7px 7px;
+    margin-bottom: 5px;
+    margin-left: 20px;
+}
+
+.messageOut .v-list__tile__title, .messageOut .ist__tile__title{
+    text-align:right;
+}
+.messageOut .v-list__tile__content, .messageOut .list__tile__content{
+    text-align:right;
+    align-items: flex-end;
+}
+.v-messages__message, .error--text{
+    color: #E44 !important;
+}
+
+.contact-list{
+    border-right: 1px solid #ccc;
+}
+.current-contact{
+    background-color: #eee;
+}
+.contact-selection {
+    background-color: #eee; 
+    box-shadow: 0px 0px 10px #ccc;
+    margin-bottom: 15px;
+}
+.contact-selection .v-input__slot{
+    border-style: initial;
+}
+.contact-selection .v-text-field__details{
+    display:none;
+}
+
+.rounded {
+    border-radius: 7px;
+}
+
+a:link, a:visited {
+    color: #44A;
+    text-decoration: none;
+}
+

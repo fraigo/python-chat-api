@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="shortcut icon" href="images/messages-120.png">
+    <meta name="google-signin-scope" content="profile email https://www.googleapis.com/auth/contacts.readonly">
+    <meta name="google-signin-client_id" content="774131575761-qimgujhl8d3ppsp9l097bcnue8u18h58.apps.googleusercontent.com">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons' rel="stylesheet">
+    <link href="lib/vuetify.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@1.3.11/dist/vuetify.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+  <body>
+    <div id="app" style="display:none">
+        <v-toolbar>
+            <v-toolbar-side-icon @click="menu=true"></v-toolbar-side-icon>
+            <v-toolbar-title>Messages</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-toolbar-items >
+                <v-flex>
+                    <div style="
+                    text-align:right;
+                    align-items: center;
+                    display: inline-flex;
+                    vertical-align: middle;" 
+                    v-if="isLogged">
+                        
+                        <span class="pa-2">
+                            <b>{{user.name}}</b>
+                            <br>
+                            <a @click="signOut" href="#" >Sign out</a>
+                        </span>
+                        <v-avatar @click="viewProfile" size="32">
+                            <img :src="imageUrl(user.imageUrl)" >
+                        </v-avatar>
+                    </div>
+                </v-flex>
+                <v-btn v-show="!isLogged" @click="signIn" class="g-signin2" data-onsuccess="onSignIn"  flat>
+                    Sign In</v-btn>
+            </v-toolbar-items>
+        </v-toolbar>
+        <v-navigation-drawer 
+            absolute 
+            :value="menu"
+            >
+            <v-toolbar flat>
+                <v-toolbar-side-icon @click="menu=false"></v-toolbar-side-icon>
+                <v-list>
+                <v-list-tile>
+                    <v-list-tile-title class="title">
+                    Messages
+                    </v-list-tile-title>
+                </v-list-tile>
+                </v-list>
+            </v-toolbar>
+        
+            <v-divider></v-divider>
+        
+            <v-list dense class="pt-0">
+                <v-list-tile
+                v-for="item in actions"
+                :key="item.title"
+                @click="menuClick(item)"
+                v-show="isVisible(item)"
+                >
+                <v-list-tile-action>
+                    <v-icon>{{ item.icon }}</v-icon>
+                </v-list-tile-action>
+        
+                <v-list-tile-content>
+                    <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile-content>
+                </v-list-tile>
+            </v-list>
+        </v-navigation-drawer>
+        <v-container fluid>
+        
+        <v-layout fill-height row wrap v-if="hash=='#contacts'">
+            <v-flex sm4 class="contact-list pr-3 hidden-xs-only">
+                <v-list  >
+                    <template v-for="item in contacts">
+                        <v-list-tile
+                        :key="item.id"
+                        avatar
+                        @click="contactClick(item)"
+                        :class="currentContact.email==item.email?'current-contact':''"
+                        >
+                        <v-list-tile-avatar>
+                            <img :src="imageUrl(item.imageUrl)">
+                            {{item.click}}
+                        </v-list-tile-avatar>
+            
+                        <v-list-tile-content>
+                            <v-list-tile-title v-html="item.name"></v-list-tile-title>
+                            <v-list-tile-sub-title v-html="item.email"></v-list-tile-sub-title>
+                        </v-list-tile-content>
+                        <v-list-tile-action>
+                            <v-icon v-if="currentContact.email==item.email">message</v-icon>
+                            <v-icon v-if="currentContact.email!=item.email">chat_bubble_outline</v-icon>
+                        </v-list-tile-action>
+                        </v-list-tile>
+                    </template>
+                </v-list>
+            </v-flex>
+            <v-flex sm8 class="pl-3">
+                <v-combobox
+                    v-model="currentContact"
+                    :items="allContacts"
+                    item-text="name"
+                    label=""
+                    @change="contactClick(currentContact)"
+                    class="contact-selection"
+                >
+                    <template slot="selection" slot-scope="data">
+                        <v-layout row
+                            :selected="data.selected"
+                            :disabled="data.disabled"
+                            :key="data.id"
+                            @input="data.parent.selectItem(data.item)"
+                        >
+                            <ContactSelector 
+                                :imageUrl="data.item.imageUrl"
+                                :name="data.item.name"
+                                :email="data.item.email"
+                                />
+                        </v-layout>
+                    </template>
+                    <template slot="item" slot-scope="data">
+                            <v-layout row 
+                                :key="data.item.id"
+                            >
+                                <ContactSelector 
+                                    :imageUrl="data.item.imageUrl"
+                                    :name="data.item.name"
+                                    :email="data.item.email"
+                                    />
+                                
+                                
+                            </v-layout>
+                        </template>
+                </v-combobox>
+                        
+                <v-list id="messageList" two-line style="overflow-y: auto; max-height:calc(100vh - 180px)">
+                    <h2>
+                        {{currentContact.name}}
+                    </h2>
+                    <template v-for="item in messages">
+                        <v-list-tile
+                        :key="item.id"
+                        avatar
+                        @click="messageClick(item)"
+                        :class="item.from==user.email?'messageOut':'messageIn'"
+                        >
+                        <v-list-tile-avatar v-if="item.from!=user.email">
+                            <img :src="imageUrl(findContact(item.from).imageUrl)">
+                            {{item.click}}
+                        </v-list-tile-avatar>
+            
+                        <v-list-tile-content>
+                            <div class="messageContent">{{item.message}}</div>
+                            <small>{{timeAgo(item.timestamp)}}</small>
+                    
+                        </v-list-tile-content>
+
+                        <v-list-tile-avatar v-if="item.from==user.email">
+                            <img :src="imageUrl(findContact(item.from).imageUrl)">
+                            {{item.click}}
+                        </v-list-tile-avatar>
+                        </v-list-tile>
+                    </template>
+                </v-list>
+            </v-flex>
+        </v-layout>
+
+        <v-layout v-if="hash=='#profile'">
+            <div>
+                <v-avatar :size="120">
+                    <img :src="imageUrl(user.imageUrl)" >
+                </v-avatar>
+            </div>
+            <div>
+                <h3>{{user.name}}</h3>
+                <p>
+                {{user.email}}
+                </p>
+            </div>
+        </v-layout>
+        <v-layout v-if="isLogged">
+            <v-flex>
+                    <v-btn
+                    absolute
+                    dark
+                    fab
+                    right
+                    color="pink"
+                    style="bottom: 20px"
+                    @click="newContact"
+                  >
+                    <v-icon >add</v-icon>
+                  </v-btn>
+            </v-flex>
+        </v-layout>
+        <v-dialog
+            v-model="dialog"
+            width="500"
+            data-app="app"
+        >
+            <v-card>
+            <v-card-title
+                class="headline grey lighten-2"
+                primary-title
+            >
+                {{dialogTitle}}
+            </v-card-title>
+    
+            <v-card-text>
+                
+                <v-form v-model="valid">
+                    
+                    <v-combobox
+                        v-model="newMessage.contact"
+                        :items="allContacts"
+                        item-text="name"
+                        label=""
+                        @change="newContactSelected(newMessage.contact)"
+                        class="contact-selection rounded"
+                        placeholder="Select Contact"
+                        @input="ctKeydown"
+                        clearable
+                    >
+                        <template slot="selection" slot-scope="data">
+                            <v-layout row
+                                :selected="data.selected"
+                                :disabled="data.disabled"
+                                :key="data.item.email"
+                                @input="data.parent.selectItem(data.item)"
+                            >
+                            <div>"{{ data.item.name }}"" &lt;{{ newMessage.email = data.item.email }}&gt;"</div>
+                                    
+                            </v-layout>
+                        </template>
+                        <template slot="item" slot-scope="data">
+                                <v-layout row 
+                                    :title="data.item"
+                                    :key="data.item.email+data.item.name"
+                                >
+                                    <div>"{{ data.item.name }}"" &lt;{{ data.item.email }}&gt;"</div>
+                                    
+                                </v-layout>
+                            </template>
+                    </v-combobox>
+                    <v-text-field
+                        v-model="newMessage.email"
+                        label="E-mail"
+                        :rules="rules.email"
+                        @keypress="newMessage.contact=null"
+                        required
+                        clearable
+                    ></v-text-field>
+                    <v-text-field
+                        v-model="newMessage.message"
+                        label="Message"
+                        :rules="rules.message"
+                        id="messageText"
+                        required
+                    ></v-text-field>
+                </v-form>
+
+
+            </v-card-text>
+    
+            <v-divider></v-divider>
+    
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                color="primary"
+                flat
+                @click="sendContact"
+                >
+                Send
+                </v-btn>
+            </v-card-actions>
+            </v-card>
+        </v-dialog>
+        </v-container>
+    </div>
+    
+    <script src="https://apis.google.com/js/platform.js"></script>
+    <script src="lib/vue.min.js"></script>
+    <script src="lib/vuetify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/google.js"></script>
+  </body>
+</html>

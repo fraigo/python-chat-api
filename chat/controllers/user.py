@@ -4,11 +4,17 @@ from django.forms.models import model_to_dict
 from chat.models import User
 
 def register(request,user):
-    user = User(
-        email=user, 
-        name=request.GET.get('name', user),
-        imageUrl=request.GET.get('imageUrl', '')
-        )
+    try:
+        user = User.objects.get(email=user)
+        user.name = request.GET.get('name', user.name)
+        user.imageUrl = request.GET.get('imageUrl', user.imageUrl)
+        user.save
+    except:
+        user = User(
+            email=user, 
+            name=request.GET.get('name', user),
+            imageUrl=request.GET.get('imageUrl', '')
+            )
     try:
         user.save()
         data = model_to_dict(user)
