@@ -22,10 +22,10 @@ from chat import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index),
-    path('User/register/<user>/', user.register ),
-    path('User/get/<user>', user.get ),
-    path('Message/push/<user>/', message.push ),
-    path('Message/get/<user>/', message.get ),
-    path('Sender/get/<user>/', message.senders ),
-    path('Message/get/<user>/<rec>/', message.get ),
+    path('User/register/<user>/', user.register),
+    path('User/get/<user>', user.get),
+    path('Message/push/<user>/', message.push),
+    path('Message/get/<user>/', message.get),
+    path('Sender/get/<user>/', message.senders),
+    path('Message/get/<user>/<rec>/', message.get),
 ]

@@ -22,19 +22,19 @@ def register(request, user):
         return get(request, user.email)
     except:
         error = {
-            "message" : "Error"
+            "message": "Error"
         }
         return JsonResponse(error, status=400)
-    
+
 
 def get(request, user):
     try:
         user = User.objects.get(email=user)
         data = {
-            "name" : user.name,
-            "email" : user.email,
-            "imageUrl" : user.imageUrl,
-            "contacts" : message.senderData(user.email)
+            "name": user.name,
+            "email": user.email,
+            "imageUrl": user.imageUrl,
+            "contacts": message.senderData(user.email)
         }
         return JsonResponse(data)
     except:

@@ -18,7 +18,7 @@ def createSender(email):
             sender.imageUrl = tmpUser.imageUrl
             sender.save()
         except:
-            pass    
+            pass
     except:
         try:
             toUser = User.objects.get(email=email)
@@ -31,23 +31,24 @@ def createSender(email):
         sender.save()
     return sender
 
+
 def createMessage(user, to, message):
     try:
         sender = Sender.objects.get(email=user)
     except:
         error = {
-            "message" : "Invalid sender"
+            "message": "Invalid sender"
         }
         return error
     try:
         recipient = Sender.objects.get(email=to)
     except:
         error = {
-            "message" : "Invalid recipient"
+            "message": "Invalid recipient"
         }
         return error
     message = Message(
-        sender=sender, 
+        sender=sender,
         recipient=recipient,
         message=message,
         timestamp=datetime.datetime.now()
@@ -55,48 +56,59 @@ def createMessage(user, to, message):
     message.save()
     return message
 
-def push(request,user):
+
+def push(request, user):
     to = request.GET.get('to')
     message = request.GET.get('message')
     createSender(user)
     createSender(to)
     try:
-        message = createMessage( user, to, message)
+        message = createMessage(user, to, message)
         data = model_to_dict(message)
         return JsonResponse(data)
     except Exception as e:
         e_type, e_obj, e_tb = sys.exc_info()
         error = {
-            "message" : "Error creating message: %s (%d)" % ( str(e) , e_tb.tb_lineno )
+            "message": "Error creating message: %s (%d)"
+            % (str(e), e_tb.tb_lineno)
         }
         return JsonResponse(error, status=400)
-    
 
-def get(request, user, rec = None):
+
+def get(request, user, rec=None):
     try:
         if rec:
-            messages = Message.objects.filter( Q(sender__email=user) | Q(recipient__email=user) , Q(sender__email=rec) | Q(recipient__email=rec) )
+            messages = Message.objects.filter(
+                Q(sender__email=user) | Q(recipient__email=user),
+                Q(sender__email=rec) | Q(recipient__email=rec)
+                )
         else:
-            messages = Message.objects.filter( Q(sender__email=user) | Q(recipient__email=user) )
+            messages = Message.objects.filter(
+                Q(sender__email=user) | Q(recipient__email=user)
+                )
         data = []
         for msg in messages:
             data.append({
-                "from" : msg.sender.email,
-                "to" : msg.recipient.email,
-                "message" : msg.message,
-                "visible" : msg.visible,
-                "timestamp" : int(msg.timestamp.timestamp())
+                "from": msg.sender.email,
+                "to": msg.recipient.email,
+                "message": msg.message,
+                "visible": msg.visible,
+                "timestamp": int(msg.timestamp.timestamp())
             })
         return JsonResponse(data, safe=False)
     except Exception as e:
         e_type, e_obj, e_tb = sys.exc_info()
         error = {
-            "message" : "Error creating message: %s (%d)" % ( str(e) , e_tb.tb_lineno )
+            "message": "Error creating message: %s (%d)"
+            % (str(e), e_tb.tb_lineno)
         }
         return JsonResponse(error, status=400)
 
+
 def senderData(user):
-    messages = Message.objects.filter( Q(sender__email=user) | Q(recipient__email=user) )
+    messages = Message.objects.filter(
+        Q(sender__email=user) | Q(recipient__email=user)
+        )
     senders1 = messages.values("sender").distinct()
     senders2 = messages.values("recipient").distinct()
     data = []
@@ -104,21 +116,22 @@ def senderData(user):
         sender = Sender.objects.get(pk=senderid["sender"])
         if sender.email != user and sender not in data:
             data.append({
-                "name" : sender.name,
-                "email" : sender.email,
-                "id" : sender.id,
-                "imageUrl" : sender.imageUrl,
+                "name": sender.name,
+                "email": sender.email,
+                "id": sender.id,
+                "imageUrl": sender.imageUrl,
             })
     for senderid in senders2:
         sender = Sender.objects.get(pk=senderid["recipient"])
         if sender.email != user and sender not in data:
             data.append({
-                "name" : sender.name,
-                "email" : sender.email,
-                "id" : sender.id,
-                "imageUrl" : sender.imageUrl,
+                "name": sender.name,
+                "email": sender.email,
+                "id": sender.id,
+                "imageUrl": sender.imageUrl,
             })
     return data
+
 
 def senders(request, user):
     try:
@@ -127,7 +140,7 @@ def senders(request, user):
     except Exception as e:
         e_type, e_obj, e_tb = sys.exc_info()
         error = {
-            "message" : "Error creating message: %s (%d)" % ( str(e) , e_tb.tb_lineno )
+            "message": "Error creating message: %s (%d)"
+            % (str(e), e_tb.tb_lineno)
         }
         return JsonResponse(error, status=400)
-
