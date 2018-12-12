@@ -27,7 +27,8 @@ SECRET_KEY = 'j3n1nyy3g0m*)+$j23m(7skhw37pmeec!nc1=fkgfrxry60ome'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost'
+    'localhost',
+    'pychat-api.herokuapp.com'
 ]
 
 
@@ -89,18 +90,20 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
+PASSWORD_VALIDATOR = 'django.contrib.auth.password_validation'
+
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': '%s.UserAttributeSimilarityValidator' % PASSWORD_VALIDATOR,
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': '%s.MinimumLengthValidator' % PASSWORD_VALIDATOR,
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': '%s.CommonPasswordValidator' % PASSWORD_VALIDATOR,
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': '%s.NumericPasswordValidator' % PASSWORD_VALIDATOR,
     },
 ]
 
