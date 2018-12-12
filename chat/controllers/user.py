@@ -23,13 +23,15 @@ def register(request, user):
         user.save()
         echo_user = echo.user()
         echo_email = echo_user['email']
+        message_content = echo.welcome(user)
         try:
             Message.objects.get(
                 sender__email=echo_email,
-                recipient__email=user.email
+                recipient__email=user.email,
+                message=message_content
                 )
         except:
-            message_content = echo.welcome(user)
+            
             message.createSender(echo_email, echo_user['name'])
             message.createMessage(echo_email, user.email, message_content)
         return get(request, user.email)
