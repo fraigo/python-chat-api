@@ -55,6 +55,10 @@ body {
     font-weight: initial !important;
 }
 
+.profile-info{
+    margin:20px;
+}
+
 .rounded {
     border-radius: 7px;
 }

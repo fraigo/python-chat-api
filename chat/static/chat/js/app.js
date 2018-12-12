@@ -79,8 +79,15 @@ var app = new Vue({
 
         },
         signOut(){
-            this.user = {},
+            this.user = {
+                contacts:[]
+            }
             this.contacts=[]
+            this.messages=[]
+            this.currentContact={}
+            API_HEADERS={}
+            contactWorker({})
+            messageWorker({})
             signOut()
         },
         signIn(){
@@ -291,7 +298,7 @@ function startWorkers() {
 function messageWorker(data, callback){
     data.headers=API_HEADERS
     mw.onmessage = function(event) {
-        callback(event.data)
+        if (callback) callback(event.data)
     };
     mw.postMessage(data)
 }
@@ -299,7 +306,7 @@ function messageWorker(data, callback){
 function contactWorker(data, callback){
     data.headers=API_HEADERS
     cw.onmessage = function(event) {
-        callback(event.data)
+        if (callback) callback(event.data)
     };
     cw.postMessage(data)
 }
