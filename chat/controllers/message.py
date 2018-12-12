@@ -1,13 +1,13 @@
 import calendar
 import time
 import datetime
+import importlib
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from chat.models import Message, Sender, User
 from chat import errors
-from chat import services
 
 
 def createSender(email, name=None):
@@ -38,17 +38,11 @@ def createMessage(user, to, message):
     try:
         sender = Sender.objects.get(email=user)
     except:
-        error = {
-            "message": "Invalid sender"
-        }
-        return error
+        raise ValueError('Invalid Sender %s' % user)
     try:
         recipient = Sender.objects.get(email=to)
     except:
-        error = {
-            "message": "Invalid recipient"
-        }
-        return error
+        raise ValueError('Invalid Recipient %s' % to)
     message = Message(
         sender=sender,
         recipient=recipient,
@@ -61,18 +55,23 @@ def createMessage(user, to, message):
 
 def push(request, user):
     to = request.GET.get('to')
-    message = request.GET.get('message')
+    msg = request.GET.get('message')
     createSender(user)
     createSender(to)
     try:
-        message = createMessage(user, to, message)
+        message = createMessage(user, to, msg)
         data = model_to_dict(message)
         service, host = to.split("@")
-        if host == "imessage@com" and service in services:
-            from services import service as svc
-            user = Sender.objects.get(email=user)
-            answer = svc.message(user, message)
-            createMessage(to, user, answer)
+        if host == "imessenger.com":
+            try:
+                svc = importlib.import_module('chat.services.%s' % service)
+                receiver = Sender.objects.get(email=user)
+                answer = svc.message(receiver, msg)
+                createMessage(to, receiver.email, answer)
+                data["service"] = service
+            except:
+                error = errors.json('Error in service %s' % service)
+                return JsonResponse(error, status=400)
         return JsonResponse(data)
     except Exception as e:
         error = errors.json('Error creating message')

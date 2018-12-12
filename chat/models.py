@@ -35,4 +35,4 @@ class Message(models.Model):
     timestamp = models.DateTimeField('date created')
 
     def __str__(self):
-        return self.message
+        return "%s [From: %s]" % (self.message, self.sender.email)
