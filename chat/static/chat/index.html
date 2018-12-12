@@ -233,6 +233,7 @@
                                 :disabled="data.disabled"
                                 :key="data.item.email"
                                 @input="data.parent.selectItem(data.item)"
+                                class="contact-data"
                             >
                             <div>"{{ data.item.name }}"" &lt;{{ newMessage.email = data.item.email }}&gt;"</div>
                                     
@@ -242,6 +243,7 @@
                                 <v-layout row 
                                     :title="data.item"
                                     :key="data.item.email+data.item.name"
+                                    class="contact-data"
                                 >
                                     <div>"{{ data.item.name }}"" &lt;{{ data.item.email }}&gt;"</div>
                                     

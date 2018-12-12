@@ -48,6 +48,12 @@ body {
 .contact-selection .v-text-field__details{
     display:none;
 }
+.contact-data{
+    font-size: 12pt !important;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: initial !important;
+}
 
 .rounded {
     border-radius: 7px;
