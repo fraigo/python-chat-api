@@ -8,5 +8,5 @@ def index(request):
 
 
 def client(request):
-    response = redirect('static/chat/index.html')
+    response = redirect('/static/chat/index.html')
     return response

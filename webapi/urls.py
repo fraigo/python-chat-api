@@ -22,7 +22,7 @@ from chat import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index),
-    path('client', views.client),
+    path('client/', views.client),
     path('User/register/<user>/', user.register),
     path('User/get/<user>', user.get),
     path('Message/push/<user>/', message.push),
