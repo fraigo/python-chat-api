@@ -38,6 +38,7 @@ body {
     background-color: #eee;
 }
 .contact-selection {
+    background-color: #eee; 
     box-shadow: 0px 0px 10px #ccc;
     margin-bottom: 15px;
 }
@@ -47,13 +48,9 @@ body {
 .contact-selection .v-text-field__details{
     display:none;
 }
-.v-list__tile{
-    font-size: 14pt;
-}
 
 .rounded {
     border-radius: 7px;
-    padding: 6px;
 }
 
 a:link, a:visited {
