@@ -148,15 +148,15 @@
                         :key="item.id"
                         avatar
                         @click="messageClick(item)"
-                        :class="item.from==user.email?'messageOut':'messageIn'"
+                        :class="item.from==user.email?'message messageOut':'message messageIn'"
                         >
                         <v-list-tile-avatar v-if="item.from!=user.email">
                             <img :src="imageUrl(findContact(item.from).imageUrl)">
                             {{item.click}}
                         </v-list-tile-avatar>
             
-                        <v-list-tile-content>
-                            <div class="messageContent">{{item.message}}</div>
+                        <v-list-tile-content class="messageContent">
+                            <div >{{item.message}}</div>
                             <small>{{timeAgo(item.timestamp)}}</small>
                     
                         </v-list-tile-content>
@@ -222,7 +222,7 @@
                         item-text="name"
                         label=""
                         @change="newContactSelected(newMessage.contact)"
-                        class="contact-selection rounded"
+                        class="contact-selection"
                         placeholder="Select Contact"
                         @input="ctKeydown"
                         clearable

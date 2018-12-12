@@ -4,9 +4,6 @@ body {
 .v-btn {
     text-transform: none
 }
-.messageContent{
-    white-space: pre-wrap;
-}
 .messageIn{
     border: 1px solid #ccc;
     border-radius: 0px 7px 7px 7px;
@@ -38,7 +35,6 @@ body {
     background-color: #eee;
 }
 .contact-selection {
-    background-color: #eee; 
     box-shadow: 0px 0px 10px #ccc;
     margin-bottom: 15px;
 }
@@ -54,7 +50,17 @@ body {
     text-overflow: ellipsis;
     font-weight: initial !important;
 }
-
+.messageContent > div{
+    white-space: pre-wrap;
+    padding: 5px;
+}
+.messageContent > small{
+    padding-top:4px;
+}
+.message .v-list__tile{
+    height: inherit;
+    min-height: 60px;
+}
 .profile-info{
     margin:20px;
 }
