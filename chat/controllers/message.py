@@ -1,15 +1,18 @@
 import calendar
 import time
-import sys
 import datetime
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
 from chat.models import Message, Sender, User
+from chat import errors
+from chat import services
 
 
-def createSender(email):
+def createSender(email, name=None):
+    if not name:
+        name = email
     try:
         sender = Sender.objects.get(email=email)
         try:
@@ -25,7 +28,6 @@ def createSender(email):
             name = toUser.name
             imageUrl = toUser.imageUrl
         except:
-            name = email
             imageUrl = ''
         sender = Sender(email=email, name=name, imageUrl=imageUrl)
         sender.save()
@@ -65,13 +67,15 @@ def push(request, user):
     try:
         message = createMessage(user, to, message)
         data = model_to_dict(message)
+        service, host = to.split("@")
+        if host == "imessage@com" and service in services:
+            from services import service as svc
+            user = Sender.objects.get(email=user)
+            answer = svc.message(user, message)
+            createMessage(to, user, answer)
         return JsonResponse(data)
     except Exception as e:
-        e_type, e_obj, e_tb = sys.exc_info()
-        error = {
-            "message": "Error creating message: %s (%d)"
-            % (str(e), e_tb.tb_lineno)
-        }
+        error = errors.json('Error creating message')
         return JsonResponse(error, status=400)
 
 
@@ -97,24 +101,22 @@ def get(request, user, rec=None):
             })
         return JsonResponse(data, safe=False)
     except Exception as e:
-        e_type, e_obj, e_tb = sys.exc_info()
-        error = {
-            "message": "Error creating message: %s (%d)"
-            % (str(e), e_tb.tb_lineno)
-        }
+        error = errors.json('Error getting messages')
         return JsonResponse(error, status=400)
 
 
 def senderData(user):
     messages = Message.objects.filter(
         Q(sender__email=user) | Q(recipient__email=user)
-        )
+        ).order_by('-timestamp')
     senders1 = messages.values("sender").distinct()
     senders2 = messages.values("recipient").distinct()
     data = []
+    emails = []
     for senderid in senders1:
         sender = Sender.objects.get(pk=senderid["sender"])
-        if sender.email != user and sender not in data:
+        if sender.email != user and sender.email not in emails:
+            emails.append(sender.email)
             data.append({
                 "name": sender.name,
                 "email": sender.email,
@@ -123,7 +125,8 @@ def senderData(user):
             })
     for senderid in senders2:
         sender = Sender.objects.get(pk=senderid["recipient"])
-        if sender.email != user and sender not in data:
+        if sender.email != user and sender.email not in emails:
+            emails.append(sender.email)
             data.append({
                 "name": sender.name,
                 "email": sender.email,
@@ -137,10 +140,6 @@ def senders(request, user):
     try:
         data = senderData(user)
         return JsonResponse(data, safe=False)
-    except Exception as e:
-        e_type, e_obj, e_tb = sys.exc_info()
-        error = {
-            "message": "Error creating message: %s (%d)"
-            % (str(e), e_tb.tb_lineno)
-        }
+    except:
+        error = errors.json('Error getting servers')
         return JsonResponse(error, status=400)

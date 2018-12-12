@@ -1,8 +1,10 @@
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.forms.models import model_to_dict
-from chat.models import User
+from chat.models import User, Message
 from chat.controllers import message
+from chat.services import echo
+from chat import errors
 
 
 def register(request, user):
@@ -19,11 +21,20 @@ def register(request, user):
         )
     try:
         user.save()
+        echo_user = echo.user()
+        echo_email = echo_user['email']
+        try:
+            Message.objects.get(
+                sender__email=echo_email,
+                recipient__email=user.email
+                )
+        except:
+            message_content = echo.welcome(user)
+            message.createSender(echo_email, echo_user['name'])
+            message.createMessage(echo_email, user.email, message_content)
         return get(request, user.email)
     except:
-        error = {
-            "message": "Error"
-        }
+        error = errors.json('Error registering user')
         return JsonResponse(error, status=400)
 
 
