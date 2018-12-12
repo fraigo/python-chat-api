@@ -31,7 +31,6 @@ def register(request, user):
                 message=message_content
                 )
         except:
-            
             message.createSender(echo_email, echo_user['name'])
             message.createMessage(echo_email, user.email, message_content)
         return get(request, user.email)
