@@ -1,4 +1,4 @@
 python manage.py migrate
-cat create_user.py | python manage.py shell
+cat create_admin.py | python manage.py shell
 
 
