@@ -55,7 +55,7 @@ body {
     padding: 5px;
 }
 .messageContent > small{
-    padding-top:4px;
+    padding:4px;
 }
 .message .v-list__tile{
     height: inherit;
