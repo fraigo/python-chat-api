@@ -233,6 +233,7 @@
                                 :disabled="data.disabled"
                                 :key="data.item.email"
                                 @input="data.parent.selectItem(data.item)"
+                                class="contact-item"
                             >
                             <div>"{{ data.item.name }}"" &lt;{{ newMessage.email = data.item.email }}&gt;"</div>
                                     
@@ -242,6 +243,7 @@
                                 <v-layout row 
                                     :title="data.item"
                                     :key="data.item.email+data.item.name"
+                                    class="contact-item"
                                 >
                                     <div>"{{ data.item.name }}"" &lt;{{ data.item.email }}&gt;"</div>
                                     
@@ -286,7 +288,6 @@
     </div>
     
     <script src="https://apis.google.com/js/platform.js"></script>
-    <script src="lib/vuetify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
     <script src="js/components.js"></script>
