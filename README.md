@@ -34,7 +34,14 @@ Also, there is a sample Web Client to consume the API endpoint.
 
 ### Prepare database
 
+Create database schema
+
 `python manage.py migrate`
+
+Create a super user
+
+`python manage.py createsuperuser`
+
 
 
 ### Run the web service (Debug mode)
@@ -54,6 +61,12 @@ To run with DEBUG disabled:
 `python manage.py collectstatic`
 
 `python manage.py runserver`
+
+### Access the web service
+
+Go to http://localhost:8000/ for the main site
+
+Go to http://localhost:8000/admin/ for the administrator interface, using your previously created super user.
 
 
 
@@ -97,12 +110,19 @@ Use the **app name** you previously registered in Heroku
 
 `git push heroku master`
 
+At the **end of the deployment** log you will find the administrator password created:
+
+`
+remote: Admin created with pass [Admin.56734564]
+`
+
+### Access the Heroku application
+
+Go to `http://your-app.herokuapp.com/` for the main site
+
+Go to `http://your-app.herokuapp.com/admin/` for the administrator interface. User is 'admin' and the password is created during the first deployment.
 
 
-
-
-
- 
 
 
 
