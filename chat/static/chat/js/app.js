@@ -190,12 +190,15 @@ var app = new Vue({
             console.log("KeyDown", ev)
             this.newMessage.email = ""
             if(typeof(this.newMessage.contact)=="string"){
-                this.newMessage.contact={
-                    name: ev,
-                    email: ev
+                var email=this.newMessage.contact;
+                if (email.match(/.+@.+/)){
+                    this.newMessage.contact={
+                        name: ev,
+                        email: ev
+                    }
+                    this.newMessage.email = ""
+                    this.newContactSelected(this.newMessage.contact)
                 }
-                this.newMessage.email = ""
-                this.newContactSelected(this.newMessage.contact)
             }
         }
     },
